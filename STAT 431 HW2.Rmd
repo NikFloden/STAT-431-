@@ -1,0 +1,66 @@
+---
+title: "STAT 431 HW2"
+author: "Nik Floden"
+date: "January 22, 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#1
+
+```{r}
+require(nortest)
+sample1 <- c(16.7, 17.4, 18.1, 18.2, 18.8, 19.3, 22.4, 24.0, 24.7, 25.7, 27.0, 35.1, 35.8, 36.5, 37.6, 39.8, 42.1, 43.2, 46.2)
+lillie.test(sample1)
+```
+
+a) The p-value is 0.2845. 
+
+b) With a p-value of 0.2845, we can state that there is little to no evidence that the data does not follow a normal distribution. 
+
+#2
+
+```{r}
+UniversityA <- c(3.42,3.54,3.21,3.63,3.22,3.80,3.70,3.20,3.75,3.31,3.49,3.61,3.95,3.86,3.00,2.86,2.92,3.59,2.91,3.77,2.70,3.06,3.30,3.14,3.82)
+
+UniversityB <- c(3.50,4.00,3.53,3.85,3.84,3.21,3.58,3.94, 3.48, 3.76, 3.40, 3.44, 4.00, 3.87, 3.23, 4.00, 3.37, 3.72, 4.00, 3.06, 3.92, 3.72, 3.91, 3.33, 3.08) 
+```
+
+a)
+```{r}
+tab <- table(UniversityA, UniversityB)
+tab
+```
+
+b)
+```{r}
+chisq.test(tab)
+```
+$X^2$ is 500.
+
+c)The p-value is 0.2552, I used one without a continuity correction. 
+
+d)With a p-value of 0.2552, we can state that there is little to no evidence against the null that there is no difference between University A's and University B's GPAs.
+
+e) No, the Null is that there is no difference between the GPAs of A and B, and the alternate is that there is a difference. 
+
+
+#3
+```{r}
+ProgA = c(143,106,108,138,101,99,120,82,92,58,42)
+ProgB = c(142,158,161,131,175,142,111,96,90,144,144)
+```
+
+a)
+```{r}
+ks.test(ProgA,ProgB)
+```
+
+D = 0.54545
+
+b) the p-value is 0.0758. 
+
+c) With a p-value of 0.0758, we can say that there is suggestive but ultimately inconclusive against the null that there is no difference in savings between the education program and the insulation installation. 

@@ -1,0 +1,77 @@
+---
+title: "STAT 431 HW 10"
+author: "Nik Floden"
+date: "April 17, 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+xi <- c(16.7, 18.2, 17.9, 16.4, 18.3, 17.2, 16.0, 17.4, 18.1, 19.3, 18.2, 16.8, 17.4, 17.5, 18.3, 19.1, 18.6, 17.9, 16.3, 18.9)
+yi <- c(17.1, 18.4, 18.2, 16.9, 18.4, 17.9, 16.5, 17.6, 18.9, 19.9, 19.1, 17.3, 17.8, 18.3, 18.9, 19.6, 18.7, 18.8, 17.0, 19.4)
+d <- c(.4, .2, .3, .5, .1, .7, .5, .2, .8, .6, .9, .5, .4, .8, .6, .5, .1, .9, .7, .5)
+
+houses <- data.frame("Xi" = xi, "Yi" = yi, "di" = d)
+houses$r <- houses$Yi / houses$Xi
+
+mean(houses$r)
+
+library(bootstrap)
+```
+
+#1. Sample Error Estimates
+
+```{r}
+rjackmean <- jackknife(houses$r, mean)
+rjackmean$jack.se
+```
+
+```{r}
+djackmean <- jackknife(d, mean)
+djackmean$jack.se
+```
+
+#2. Bias estimates
+```{r}
+rjackmean$jack.bias
+```
+
+
+```{r}
+djackmean$jack.bias
+```
+
+#3. Bias Corrected Estimates
+
+```{r}
+meanRjack <- mean(houses$r) - rjackmean$jack.bias
+meanRjack
+```
+
+```{r}
+meanDjack <- mean(houses$di) - djackmean$jack.bias
+meanDjack
+```
+
+#4. 95% Confidence intervals
+
+```{r}
+ci.r <- meanRjack + c(-1,1)*qt(.975,19)*rjackmean$jack.se
+ci.r
+```
+
+```{r}
+ci.d <- meanDjack + c(-1,1)*qt(.975, 19)*djackmean$jack.se
+ci.d
+```
+
+
+#5. Interpretation
+[1.022378, 1.035454]
+We believe with 95% certainty that the true R value of the population of town houses is between 1.022378 and 1.035454. 
+
+[0.3944588, 0.6255412]
+We believe with 95% certainty that the true mean difference in assessed value of townhouses between this year and two years ago is between 0.3944588 and 0.6255412. 

@@ -1,0 +1,196 @@
+---
+title: "STAT 431 Final"
+author: "Nik Floden"
+date: "April 25, 2019"
+output: pdf_document
+---
+
+# 1 Spearman's rho and Kendall's tau
+```{r}
+x <- c(-8.7,-8.3,-8.2,-7.2,-6.1,-6.0,-4.1,-3.2,-2.0,-1.9,-1.6,
+-1.3,-0.7,-0.2,0.4,0.7,1.3,1.6,2.1,2.2,3.1,4.0,5.6,5.9,6.2,
+6.6,6.7,8.1)
+
+y <- c(5.30,5.40,5.65,5.95,6.00,6.05,7.00,7.15,7.30,7.35,7.75,7.80, 
+7.90,8.00,2.50,2.70,2.80,2.90,3.05,3.10,3.20,3.25,3.45,3.70,4.00,
+4.40,4.70,4.80)
+```
+
+a)
+```{r}
+cor.test(x,y, method = "spearman", alternative=c("two.sided"))
+```
+$\rho = -0.5019157$, p-value = 0.007143. \newline
+b) With p = 0.007143, there is sufficent evidence to reject the null that there is no direct nor inverse association between X and Y. \newline
+
+c)
+```{r}
+cor.test(x,y, method="kendall", alternative=c("two.sided"))
+```
+$\tau = -0.03703704$, p = 0.7992 \newline
+
+d) 
+With  p-value of 0.7992, there is little to no evidence to reject the null that there is no direct nor inverse association between X and Y. \newline
+
+e)
+```{r}
+plot(x,y)
+```
+
+f)
+
+#2
+```{r}
+births <- c( 39 ,  26 , 19 , 18 ,
+             33,   48,  41,  38 ,
+             41 ,  24 , 23 , 22 ,
+             42 ,  49 , 44 , 21 ,
+             49 ,  31 , 10 , 12 ,
+             68 ,  52 , 54 , 62 ,
+             72,   92,  64,  67 ,
+             78 ,  79 , 62 , 71 ,
+             75 ,  73,  74,  65 )
+
+hospital <- c(1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,
+              6,6,6,6,7,7,7,7,8,8,8,8,9,9,9,9)
+
+season <- c(rep(c("1 Winter","2 Spring","3 Summer","4 Fall"),9))
+```
+a)Kendall's Coefficent of Concordance *W* \newline
+$H_0:$ The set of 4 seasonal rankings are not in agreement across hospitals. \newline
+$H_1:$ The set of 4 seasonal rankings are in agreement across hospitals. \newline
+b)
+```{r}
+friedman.test(births, hospital, season)
+```
+W = 27.333, P=0.0006191 \newline
+With a p-value of 0.0006191, there is strong evidence to reject the null that the set of seasonal rankings are not in agreement. 
+
+
+#3 Kendall Seasonal Trend Test 
+```{r}
+library(trend)
+births <- c( 39 ,  26 , 19 , 18 ,
+             33,   48,  41,  38 ,
+             41 ,  24 , 23 , 22 ,
+             42 ,  49 , 44 , 21 ,
+             49 ,  31 , 10 , 12 ,
+             68 ,  52 , 54 , 62 ,
+             72,   92,  64,  67 ,
+             78 ,  79 , 62 , 71 ,
+             75 ,  73,  74,  65 )
+```
+a) 
+```{r}
+mk.test(births)
+```
+p-value = .000002774. \newline
+b)With a p-value of .000002774, there is convincing evidence to reject the null hypothesis that there is no trend in births across the seasons.  
+
+#4
+```{r}
+exercise <- c(82,79,80,81,80,80,75,79,79,79,75,75,74,74,74,65,63,64,64,63,77,76,74,77,76,68,68,68,67,68,70,69,68,69,70,77,77,77,76,73)
+N <- length(exercise)
+```
+a) Page's Test \newline
+b) h0: Median resting pulse rate is the same across all months. \newline
+ha: Median resting pulse rate is decreasing across the months. \newline
+
+c)
+```{r}
+library(crank)
+blk1 = rank(exercise[seq(1,N,5)])
+blk2 = rank(exercise[seq(2,N,5)])
+blk3 = rank(exercise[seq(3,N,5)])
+blk4 = rank(exercise[seq(4,N,5)])
+blk5 = rank(exercise[seq(5,N,5)])
+rank.matrix <- t(cbind(blk1,blk2,blk3,blk4, blk5))
+rank.matrix = 8+1 - rank.matrix
+rank.matrix
+page.trend.test(rank.matrix)
+```
+With a p-value of less than or equal to .01, we have convincing evidence to reject the null that the median resting pulse rate is the same across the months. 
+
+#5
+I would recommend Fisher's test.
+
+b)
+```{r}
+x <- as.matrix(c(3,5,13,4))
+dim(x) <- c(2,2)
+fisher.test(x)
+```
+
+With a p-value of 0.087, there is suggestive but ultimately inconclusive evidence agains the null, thus we fail to reject the null that the proportion of children who initiated on the first day with adults is equal to the proportion of children who initiated on the first day with other children.
+
+#6 Two-Sample Logrank Test with Censored Data
+```{r}
+library(survival)
+
+group <- c(rep("U",26),rep("S",26))
+
+rain <- c(1202.60, 830.10, 372.40, 345.50, 321.20, 244.30, 163.00, 147.80, 95.00, 87.00, 81.20, 68.50, 47.30, 41.10, 36.60, 29.00, 28.60, 26.30, 26.10, 24.40, 21.70, 17.30, 11.50, 4.90, 4.90, 1.00, 2745.60, 1697.80, 1656.00, 978.00, 703.40, 489.10, 430.00, 334.10, 302.80, 274.70, 274.70, 255.00, 242.50, 200.70, 198.60, 129.60, 119.00, 118.30, 115.30, 92.40, 40.60, 32.70, 31.40, 17.50, 7.70, 4.10)
+
+censored <- c(0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+
+rainfall.data <- data.frame(group,rain,censored)
+survdiff(Surv(rain, censored==0)~ group, data=rainfall.data, rho=0)
+```
+With a p-value of 0.02, we have convincing evidence to reject the null that the distributions of rainfall for treated and untreated are the same. 
+
+#7 Theil estimation 
+
+```{r}
+# y = left thread , x = right thread
+
+X <- c(113,105,130,101,138,118,87,
+           116,75,96,122,103,115,107,115,102,111,
+           104,117,90,78,100,89,85,88)
+
+Y  <- c(137,105,133,108,115,170,103,
+           145,78,107,84,148,147,87,166,146,123,
+           135,112,93,76,116,78,101,123)
+```
+
+a)
+
+```{r}
+n <- length(X)
+N <- (n*(n-1))/2
+
+slr.dat <- as.data.frame(cbind(X,Y))
+
+Theil.slr <-function(dat, X, Y, alpha, htype) {
+  slr.dat <- slr.dat[order(slr.dat[,X]),]
+  combos <- combn(n, 2)
+  i.s <- combos[1,]
+  j.s <- combos[2,]
+  Y.diff <- slr.dat[j.s,Y] - slr.dat[i.s,Y]
+  X.diff <- slr.dat[j.s,X] - slr.dat[i.s,X]      
+  S <- (Y.diff/X.diff)[X.diff != 0]
+  C.stat <- sum(sign(S))  
+  
+  # Theil slope and intercept estimates
+  slope <- median(S, na.rm=TRUE)                 
+  intercept <- median((slr.dat[,Y] - slope*slr.dat[,X]), na.rm=TRUE)     
+  
+  # Large sample normal approximation of p-value for the slope
+  stdev = sqrt(n*(n-1)*((2*n)+5)/18)
+  Z <- C.stat / stdev
+  if (htype == "<")(p.val  <- pnorm(Z))
+  if (htype == ">")(p.val  <- 1-pnorm(Z))
+  if (htype == "NE")(p.val <- 2*pnorm(-abs(Z)))
+  out <- data.frame(slope, intercept, C.stat, stdev, Z, p.val, htype)
+  out
+}
+
+Theil.slr(dat=slr.dat, X=1, Y=2, alpha=.05, htype = "NE")
+```
+
+beta = 1, alpha = 12 
+\newline
+b) 
+P=0.00628497, We have very strong evidence against the null in favour of the alternate that $\beta \neq 1$. 
+\newline
+c) 
+For a single unit increase in right hand thread time, the left hand thread time increases by 1. 

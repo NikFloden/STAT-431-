@@ -1,0 +1,97 @@
+---
+title: "431 Bootstrapping Problem"
+author: "Nik Floden"
+date: "April 23, 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#1
+a) 6.965201  \newline
+b) 0.8516212 \newline
+c) 0.0005531136 \newline
+d) Normal:( 5.296,  8.634 ), Percentile:( 5.429,  8.751 )  \newline
+e) The normal, the bootstrap of the ratio appears follow a normal distribution around the bootstrapped value. \newline
+f) 5 is not within the 95% confidence interval, so it is appropriate to reject the null that $H_0: \mu_r = 5$ in favour of the alternate hypothesis that $\mu_r \neq 5$. \newline
+g)
+```{r}
+set.seed(4292019)
+library(boot)
+x <- c(30,45,120,15,90,30,15,13,30,30,90,60,120,45)
+y <- c(120,240,540,150,420,180,210,180,210,240,420,300,540,270)
+n = length(x)
+xy <- data.frame(cbind(x,y))
+Brep = 10000
+sampr <- function(xy,i=c(1:n)){
+  z <- xy[i,]
+  return(mean(z$y/z$x))
+}
+bootr <- boot(data=xy, statistic = sampr, R=Brep)
+bootr
+boot.ci(bootr, conf = .95)
+hist(bootr$t,main = "Nik Floden")
+plot(ecdf(bootr$t), main = "Nik Floden")
+```
+
+#2
+a) 5.484311 \newline
+b) 0.4458228 \newline
+c) 0.07993244 \newline
+d) Normal: ( 4.559,  6.276 ), Percentile: ( 4.905,  6.610 )
+e) I would choose the percentile, the bootstrap of the ratio does not appear to follow a normal distribution. 
+f) 5 is within (4.905, 6.610), so we fail to reject the null that $\mu_R = 5$ at $\alpha = 0.05$
+g)
+```{r}
+sampbigr <- function(xy,i=c(1:n)){
+  z <- xy[i,]
+  return(mean(z$y)/mean(z$x))
+}
+bootbigr <- boot(data=xy, statistic = sampbigr, R=Brep)
+bootbigr
+boot.ci(bootbigr, conf = .95)
+hist(bootbigr$t,main = "Nik Floden")
+plot(ecdf(bootbigr$t), main = "Nik Floden")
+```
+
+#3
+a)Intercept = 24.4575, Slope = 0.8923 \newline
+b)Normal: ( 63.7, 137.0 ), Percentile: ( 60.0, 133.6 ) \newline
+c)Normal: ( 3.124,  4.046 ), Percentile: ( 3.085,  3.995 )\newline
+d) I would report the normal in (b), and percentile in (c), because the intercept follows a normal distribution and the slope does not. 
+e) The hypothesized beta values are $\beta_0 = 0$ and $\beta_1 = 5$. 
+f)0 is not in the confidence interval so we reject the null hypothesis that $\beta_0 = 0$. 
+g)5 is not in the confidence interval, so we reject the null hyptothesis that $\beta_1 = 5$. 
+h)
+```{r}
+#########1
+lm1 <- lm(y ~ x)
+summary(lm1)
+#########
+intercept <- function(xy, i=c(1:n)){
+  z <- xy[i,]
+  slr <- lm(z$y ~ z$x)
+  return(slr$coef[1])
+}
+bootint <- boot(data=xy, statistic = intercept, R=Brep)
+bootint
+boot.ci(bootint, conf = .95)
+
+par(mfrow=c(1,2))
+hist(bootint$t,main = "Nik Floden")
+plot(ecdf(bootint$t), main = "Nik Floden")
+#########
+slope <- function(xy, i=c(1:n)){
+  z <- xy[i,]
+  slr <- lm(z$y ~ z$x)
+  return(slr$coef[2])
+}
+bootslope <- boot(data=xy, statistic = slope, R=Brep)
+bootslope
+boot.ci(bootslope, conf = .95)
+par(mfrow=c(1,2))
+hist(bootslope$t,main = "Nik Floden")
+plot(ecdf(bootslope$t), main = "Nik Floden")
+```

@@ -1,0 +1,74 @@
+---
+title: "STAT 431 HW4"
+author: "Nik Floden"
+date: "February 7, 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#1 
+A)
+```{r}
+rep <- 50000
+
+Before <- c(89, 90, 87, 98, 120, 85, 97, 88, 95, 94)
+After <- c(76, 101, 84, 86, 105, 84, 93, 80, 95, 90)
+D <- After - Before
+
+medianD <- median(D)
+medianD
+
+Fp = 0
+upper <- 0
+lower <- 0 
+n = length(D)
+
+medianDvec <- 1:rep
+for(i in 1:rep){
+  sgnvec <- sign(runif(n)-.5)
+  Dvec <- sgnvec*D
+  medianDvec[i] <- median(Dvec)
+  if(medianDvec[i] >= medianD) upper = upper+1
+  if(medianDvec[i] <= medianD) lower = lower+1
+}
+
+pval_lower <- lower/rep
+pval_lower
+```
+
+B) With a p-value of 0.0698, there is little to no evidence that the After-Before median difference is less than zero. 
+
+C)
+```{r}
+pval_upper <- upper/rep
+sgnD <- sign(medianD)
+if(sgnD < 0) pval_two_sided = 2*pval_lower
+if(sgnD > 0) pval_two_sided = 2*pval_upper
+pval_two_sided
+```
+
+D) With a p-value of .1396, there is little to no evidence to support the alternate hypothesis that the After-Before Median Difference $\neq 0$
+
+#2
+A)
+```{r}
+library(gtools)
+
+ScoreA <- c(5.1, 9.0, 7.2, 8.1, 8.8, 6.6, 5.9, 6.0, 7.8, 5.5)
+ScoreB <- c(5.2, 4.9, 6.1, 5.9, 7.0, 6.4, 5.7, 7.0, 4.8)
+
+wilcox.test(ScoreA, ScoreB)
+```
+
+B) With a P-value of 0.08613, there is some evidence, but not enough evidence to reject the null that there is no difference between the two mean nesting heights.
+
+C)
+```{r}
+wilcox.test(ScoreA, ScoreB, conf.int = T)
+```
+
+The true mean difference is between -0.19999 and 2.39999. 
+

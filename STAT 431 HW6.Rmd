@@ -1,0 +1,52 @@
+---
+title: "Stat 431 HW6"
+author: "Nik Floden"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#1
+The null hypothesis is the median length of the lines is the same across all samples. 
+The alternate is that at least one sample has a different median length. 
+
+\newpage
+
+
+
+#2a
+```{r}
+library(perm)
+
+prep = 50000
+
+y <-c(2.974, 0.945, 1.639, 0.039, 1.296, 0.768, 0.803, 0.216, 0.074, 1.508, 4.825, 2.252,1.561, 2.045, 1.096)
+
+nvec <- c(5,5,5)
+
+group <- c(1,1,1,1,1,2,2,2,2,2,3,3,3,3,3)
+group <- as.factor(group)
+
+permControl = permControl(nmc=prep, seed = 2202019, p.conf.level = 0.95)
+permKS(y, group, control=permControl)
+
+```
+#2b
+The ANOVA has a p-value of 0.08834 and the Permutation test has a p-value of 0.07266. These are both suggestive, but inconclusive. More data is required to make clearer statements. 
+
+
+#3
+The null hypothesis is that the median phosphorus content will be the same across all heights of grass.
+The alternate hypothesis is that there is at least one height of grass where the median phosphorus content less than the rest of the heights. 
+
+```{r}
+library(clinfun)
+
+height <- c(rep(20, 7), rep(15, 7), rep(10, 7), rep(5,7))
+pcon <- c(13.0, 21.1, 11.7, 16.3, 15.5, 18.5, 22.1, 24.5, 18.0, 14.0, 24.2, 11.6, 19.0, 18.5, 15.6, 23.8, 24.4, 24.0, 21.0, 21.1, 20.4, 35.3, 22.5, 16.9, 25.0, 23.1, 26.0, 22.2)
+
+jonckheere.test(pcon, height, alternative="decreasing")
+```
+
+With a P-value of 0.001396, we have strong enough evidence to reject the null under  $\alpha = 0.5$. With this, we can state that there is at least one height of grass that has a lower phosphorus content than the rest of the heights. 

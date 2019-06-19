@@ -1,0 +1,42 @@
+---
+title: "Hoeffding's D"
+author: "Nik Floden"
+date: "April 26, 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Hoeffding's D is used mainly as a test of independence as well as a non-parametric correlation coefficent. Hoeffding's D is useful because it can identify non-monotonic and non-functional relationships along with linear and non-linear relationships. 
+
+There are no assumptions required for the data. 
+
+Hoeffding's D measures the difference between the joint ranks of (X,Y) and the product of their marginal ranks. The D statistic lies on the interval [-.5, 1] if there are no tied ranks, with larger values indicating a stronger relationship between variables (Clark). The null hypothesis of the D statistic is that the data follows a bivariate empirical distribution. The alternate is that the data does not. 
+
+Examples (Taken from Frank E Harrell Jr's examples):
+```{r}
+suppressMessages(library(Hmisc))
+set.seed(2019)
+x <- seq(-10,10, length=200)
+y <- x*sign(runif(200,-1,1))
+plot(x,y)
+hoeffd(x,y)
+```
+The Hoeffding's D statistic is 0.07, showing a lack of correlation, as well as a lack of independence. The null hypothesis that the data follows an empirical bivariate distribution is rejected, which strongly implies that the data does not follow an empirical bivariate distribution. 
+
+```{r}
+x <- c(-2, -1, 0, 1, 2)
+y <- c(4,   1, 0, 1, 4)
+z <- c(1,   2, 3, 4, NA)
+q <- c(1,   2, 3, 4, 5)
+hoeffd(cbind(x,y,z,q))
+```
+Hoeffding's D for this matrix is either 1 or zero, so there is correlation between some but not all of the matrix pairs. The D statistics where NA is listed are because pairs that have fewer than 5 non-missing values have their D statistic set to NA. 
+\newline
+
+Works Cited: \newline
+Clark, Michael. A Comparison of Correlation Measures. A Comparison of Correlation Measures.\newline
+Frank E Harrell Jr, with contributions from Charles Dupont and many others. (2019). Hmisc: Harrell
+  Miscellaneous. R package version 4.2-0. https://CRAN.R-project.org/package=Hmisc

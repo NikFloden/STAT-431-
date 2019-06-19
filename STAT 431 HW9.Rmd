@@ -1,0 +1,145 @@
+---
+title: "STAT 431 HW 9"
+author: "Nik Floden"
+date: "April 10, 2019"
+output: pdf_document
+---
+
+#1
+a) The appropriate test is Fisher's exact test. 
+
+b)
+```{r}
+x <- as.matrix(c(26,18,6,10,18,30))
+dim(x) <- c(3,2)
+x
+fisher.test(x, alternative = "less")
+```
+
+With a p-value of .000007, we reject the null hypothesis that the true proportion of plants in good condition is equal across months. 
+
+#2
+a)
+```{r}
+y <- as.matrix(c(9,13,12,50))
+dim(y) <- c(2,2)
+y
+fisher.test(y)
+```
+
+With a p-value of 0.08265 there is little evidence to reject the null that there is no difference between proportion of men hired and women hired. 
+
+b)
+```{r}
+MHtable <- array(c(2,11,49,8,4,1,1,0,3,1,3,1), dim=c(2,2,3), dimnames = list(
+    Applicants = c("Male", "Female"),
+    Hire = c("Hired", "Not Hired"),
+    College = c("Education", "Bus. Admin.", "Engineering")))
+MHtable
+mantelhaen.test(MHtable,correct = FALSE)
+```
+
+With a p-value of 0.07, there is suggestive, but ultimately inconclusive evidence against the null that the true proportions of men hired and women hired are equal. 
+
+c) Yes. 
+
+#3
+a) The Kruskal-Wallis test.
+
+b)$H_0: M_{initial} = M_1 = M_2 = M_3 = M_4$
+\newline
+$H_a: M_{initial} > M_1 > M_2 > M_3 > M_4$
+
+c)
+```{r}
+
+init <- c(82, 80, 75, 65, 77, 68, 70, 77)
+m1 <- c(84, 80, 78, 72, 74, 69, 74, 76)
+m2 <- c(77, 76, 77, 68, 72, 65, 71, 78)
+m3 <- c(76, 76, 74, 65, 75, 66, 70, 72)
+m4 <- c(79, 78, 72, 66, 75, 64, 68, 70)
+
+total <- c(init,m1,m2,m3,m4)
+group <- c(rep("a",length(init)),rep("b",length(m1)), rep("c",length(m2)), rep("d",length(m3)), rep("e",length(m4)))
+group <- as.factor(group)
+kruskal.test(total, group)
+```
+
+With a p-value of 0.4835, there is no evidence to reject the null that the true median heartrate is equal across time goes on. 
+
+d) No, there is no randomization of treatment that can be seen with the data provided. 
+
+#4
+```{r}
+library(modeltools)
+library(coin)
+IN <- c(19,25,30,34,37,46,47,51,56,57,61,66,67,74,78,86,122,123,130,133,134,136,141,143,151,152,153,154,156,162,164,165,182,189)
+
+IP <- c(22,23,38,42,73,77,89,115,144)
+
+total <-c(IN, IP)
+group <- c(rep("IN", length(IN)),rep("IP", length(IP)))
+group <- as.factor(group)
+median_test(total ~ group, conf.int=T, distribution="exact")
+```
+
+With a p-value of 0.4566, there is very little evidence to reject the null that the median time to death between Immunoperoxidase Negative subjects and Immunoperoxidase Positive subjects is not equal. 
+
+#5
+a)
+```{r}
+W <- c(37,37,33,33,30,27,27,23,23,-9,17,17,17,12,7,7,7,7,-18,-19,-1,-5,-5,-9,-9,-12,-14,-27,-17,-29,-29,-25,-25,-28,-30,-35,-36,-37,-38)
+M = 18
+P = 11
+
+wobs = sum(W[1:M])
+wobs
+absW = abs(wobs)
+
+iter = 100000
+pW <- 1:iter
+
+for(i in 1:iter){
+  s <- sample(W,M)
+  Wsum = sum(s)
+  pW[i] <- Wsum
+}
+pW <- sort(pW)
+
+xquantile <- quantile(pW, probs = c(.005, .01, .025, .05, .95, .975, .99, .995))
+
+pdist <- quantile(pW, probs = seq(0,1,1/iter))
+
+absW = abs(wobs)
+
+ntail1 <- length(pdist[pW <= -absW])
+tail1 <- ntail1/iter
+tail1
+
+ntail2 <- length(pdist[pW >= absW])
+tail2 <- ntail2/iter
+tail2
+
+twotail = tail1 + tail2
+twotail
+
+plot(ecdf(pW), main="Monte Carlo ECDF of Gehan W")
+```
+
+With a p-value of 2e-05, we have sufficent evidence to reject the null that the survival between subjects using the 6-MP drug and the placebo is equal.
+
+b) 
+```{r}
+library(survival)
+
+group<- c(rep("6-MP", 18), rep("Placebo", 21))
+time <- c(6, 6, 6, 7, 10, 13, 22, 23, 6, 9, 10, 17, 19, 19, 25, 32, 34, 35, 1, 1, 2, 2, 3, 4, 4, 5, 5, 8, 8, 8, 8, 11, 11, 12, 12, 15, 17, 22, 23)
+
+censor <- c(1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+
+patient.data <- data.frame(group, time, censor)
+patient.data
+survdiff(Surv(time, censor == 1)~group, data = patient.data, rho = 0)
+```
+
+With a p-value of 2e-04, we reject the null that the true survival times between patients who used 6-MP and a placebo is equal. 
